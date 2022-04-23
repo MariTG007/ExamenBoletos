@@ -25,3 +25,4 @@ namespace Concert.Models
         public bool WasUsed { get; set; }
     }
 }
+
