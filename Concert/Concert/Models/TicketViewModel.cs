@@ -29,8 +29,9 @@ namespace Concert.Models
 
 
 
-       
-        public int? EntranceId { get; set; }
+
+        //public IEnumerable<SelectListItem>? EntranceId { get; set; }
+        public Entrance? EntranceId { get; set; }
 
         public DateTime? Date { get; set; }
     }
