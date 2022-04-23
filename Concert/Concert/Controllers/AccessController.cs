@@ -22,58 +22,33 @@ namespace Concert.Controllers
             return View(await _context.Tickets.ToListAsync());
         }
 
-        public async Task<IActionResult> ValidationTicket(int? id)
+        public IActionResult CheckTicket()
         {
-
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Ticket ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null)
-            {
-                return NotFound();
-            }
-            return View(ticket);
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ValidationTicket(int id, Ticket ticket)
+        public async Task<IActionResult> CheckTicket(int? id)
         {
-            if (id != ticket.Id)
+            if (id == null)
             {
                 return NotFound();
+               
             }
 
-            if (ModelState.IsValid)
+            var ticket = await _context.Tickets
+                .FirstOrDefaultAsync(t => t.Id == id);
+            if (ticket == null)
             {
-                try
-                {
-                    _context.Update(ticket);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya se uso el ticket.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
+                ModelState.AddModelError(string.Empty, "Ticket no existe.");
             }
-            return View(ticket);
+            if (ticket.WasUsed != false)
+            {
+                ModelState.AddModelError(string.Empty, "Ticket ya es usado.");
+                return RedirectToAction(nameof(Index), new { Id = ticket.Id });
+            }
+            return RedirectToAction(nameof(Index), new { Id = ticket.Id });
         }
 
 
