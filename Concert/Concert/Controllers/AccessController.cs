@@ -19,7 +19,7 @@ namespace Concert.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Tickets.ToListAsync());
+            return View();
         }
 
         public IActionResult CheckTicket()
@@ -34,124 +34,129 @@ namespace Concert.Controllers
             if (id == null)
             {
                 return NotFound();
-               
+
             }
 
             Ticket ticket = await _context.Tickets
                 .FirstOrDefaultAsync(t => t.Id == id);
-            // _context.UpdateRange(ticket);
-            //await _context.SaveChangesAsync();
+           
 
-            
-                if (id < 0 || id > 5003)
-                {
-                    TempData["Message"] = "Error de boleta, no existe";
-                    
+            if (id < 0 || id > 5000)
+            {
+                TempData["Message"] = "Error de boleto, no existe";
+
                 return RedirectToAction(nameof(CheckTicket));
 
-                }
-            
-            
+            }
+
+
 
             if (ticket.WasUsed != false)
             {
-                TempData["Message"] = "Ticket ya es usado.";
+                TempData["Message"] = "El boleto ya es usado.";
                 TempData["Name"] = ticket.Name;
                 TempData["Document"] = ticket.Document;
                 TempData["Date"] = ticket.Date;
+                TempData["Entrance"] = ticket.Entrance;
+
                 //TODO : time and entrance
+
+                
+
                 return RedirectToAction(nameof(CheckTicket), new { Id = ticket.Id });
+                
             }
-            else{
-                TempData["Message"] = "Ticket no ha sido usada.";
+
+           
+           
+            else {
+                TempData["Message"] = "El boleto no ha sido usado.";
                 return RedirectToAction(nameof(Register), new { Id = ticket.Id });
             }
 
-            
 
-            
-          
-            
-        }
-
-        private object Register()
-        {
-            throw new NotImplementedException();
         }
 
 
-        /*
-        public async Task<IActionResult> Register()
-        {
-            TicketViewModel model = new()
-            {
-                Id = Guid.Empty.ToString(),
-                EntranceId = await _combosHelper.GetComboEntrancesAsync(),
-               
-            };
 
-            return View(model);
+
+        public async Task<IActionResult> RegisterCheckTicket(int? id)
+        { 
+            
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                Ticket ticket = await _context.Tickets.FindAsync(id);
+                if (ticket == null)
+                {
+                    return NotFound();
+                }
+
+                    return View(ticket);
         }
+
+                public async Task<IActionResult> Register(int? id)
+                {
+                   Ticket ticket = await _context.Tickets.FindAsync(id);
+                    TicketViewModel model = new()
+                 {
+                Document = ticket.Document,
+                    Id = ticket.Id,
+                    Name = ticket.Name,
+                    Date = (DateTime)ticket.Date,
+                    WasUsed = true,
+                    Entrances = await _combosHelper.GetComboEntrancesAsync(),
+                };
+
+                    return View(model);
+                    return View(await _context.Entrances
+                    .Include(e => e.Description)
+                    .ToListAsync());
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(AddUserViewModel model)
+        public async Task<IActionResult> Register(int? id, TicketViewModel model)
         {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
-                Guid imageId = Guid.Empty;
-
-                if (model.ImageFile != null)
+                try
                 {
-                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
+                    Ticket ticket = await _context.Tickets.FindAsync(model.Id);
+                    ticket.Document = model.Document;
+                    ticket.Name = model.Name;
+                    ticket.Date = DateTime.Now;
+                    ticket.WasUsed = true;
+                    ticket.Entrance = await _context.Entrances.FindAsync(model.EntranceId);
+                    _context.Update(ticket);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-
-                model.ImageId = imageId;
-                User user = await _userHelper.AddUserAsync(model);
-                if (user == null)
+                catch (Exception exception)
                 {
-                    ModelState.AddModelError(string.Empty, "Este correo ya está siendo usado.");
-                    model.Countries = await _combosHelper.GetComboCountriesAsync();
-                    model.States = await _combosHelper.GetComboStatesAsync(model.CountryId);
-                    model.Cities = await _combosHelper.GetComboCitiesAsync(model.StateId);
-                    return View(model);
+                    ModelState.AddModelError(string.Empty, exception.Message);
                 }
+            }
 
-                LoginViewModel loginViewModel = new()
-                {
-                    Password = model.Password,
-                    RememberMe = false,
-                    Username = model.Username
-                };
-
-                var result2 = await _userHelper.LoginAsync(loginViewModel);
-
-                if (result2.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+            model.Entrances = await _combosHelper.GetComboEntrancesAsync();
+            return View(model);
             }
         }
-        */
-        public async Task<IActionResult> DetailTicket(int? id)
-        
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            Ticket ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null)
-            {
-                return NotFound();
-            }
-
-            return View(ticket);
-        }
-
-      
     }
 
-}
+  
+
+
+
+
+
 

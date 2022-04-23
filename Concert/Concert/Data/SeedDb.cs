@@ -30,25 +30,16 @@ namespace Concert.Data
                 for (int i = 0; i < 5000; i++)
                 {
                     _context.Tickets.Add(new Ticket{
-                      
-                        WasUsed = false,
+
                         Document = null,
-                        Name = null,
                         Entrance = null,
                         Date = null,
-                        
+                        Name = null,
+                        WasUsed = false,
+
                     });
                 }
-                _context.Tickets.Add(new Ticket
-                {
-
-                    WasUsed = true,
-                    Document = "1234",
-                    Name = "Danny",
-                    Entrance = null,
-                    Date = DateTime.Now,
-
-                });
+               
 
                await _context.SaveChangesAsync();
             }

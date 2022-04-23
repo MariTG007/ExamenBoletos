@@ -13,14 +13,14 @@ namespace Concert.Data
         {
         }
 
-        public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<Entrance> Entrances { get; set; }
 
+        public DbSet<Entrance> Entrances { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Ticket>().HasIndex(t => t.Name).IsUnique();
-            modelBuilder.Entity<Entrance>().HasIndex(e => e.Description).IsUnique();
+            modelBuilder.Entity<Entrance>().HasIndex(c => c.Id).IsUnique();
+            modelBuilder.Entity<Ticket>().HasIndex("Id", "EntranceId").IsUnique();
         }
     }
 

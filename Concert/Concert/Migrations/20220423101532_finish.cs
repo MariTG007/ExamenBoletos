@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Concert.Migrations
 {
-    public partial class ticket : Migration
+    public partial class finish : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,7 +15,7 @@ namespace Concert.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,9 +28,9 @@ namespace Concert.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    WasUsed = table.Column<bool>(type: "bit", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    WasUsed = table.Column<bool>(type: "bit", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Document = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     EntranceId = table.Column<int>(type: "int", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -45,11 +45,10 @@ namespace Concert.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entrances_Description",
+                name: "IX_Entrances_Id",
                 table: "Entrances",
-                column: "Description",
-                unique: true,
-                filter: "[Description] IS NOT NULL");
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_EntranceId",
@@ -57,11 +56,11 @@ namespace Concert.Migrations
                 column: "EntranceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_Name",
+                name: "IX_Tickets_Id_EntranceId",
                 table: "Tickets",
-                column: "Name",
+                columns: new[] { "Id", "EntranceId" },
                 unique: true,
-                filter: "[Name] IS NOT NULL");
+                filter: "[EntranceId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

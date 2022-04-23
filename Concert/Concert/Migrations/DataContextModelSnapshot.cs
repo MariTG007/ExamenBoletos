@@ -31,13 +31,13 @@ namespace Concert.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Description")
-                        .IsUnique()
-                        .HasFilter("[Description] IS NOT NULL");
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.ToTable("Entrances");
                 });
@@ -54,24 +54,26 @@ namespace Concert.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Document")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int?>("EntranceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("WasUsed")
+                    b.Property<bool?>("WasUsed")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EntranceId");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("Id", "EntranceId")
                         .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
+                        .HasFilter("[EntranceId] IS NOT NULL");
 
                     b.ToTable("Tickets");
                 });
@@ -79,10 +81,15 @@ namespace Concert.Migrations
             modelBuilder.Entity("Concert.Data.Entities.Ticket", b =>
                 {
                     b.HasOne("Concert.Data.Entities.Entrance", "Entrance")
-                        .WithMany()
+                        .WithMany("tickets")
                         .HasForeignKey("EntranceId");
 
                     b.Navigation("Entrance");
+                });
+
+            modelBuilder.Entity("Concert.Data.Entities.Entrance", b =>
+                {
+                    b.Navigation("tickets");
                 });
 #pragma warning restore 612, 618
         }
