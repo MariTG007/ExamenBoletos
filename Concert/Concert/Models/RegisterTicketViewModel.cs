@@ -4,7 +4,7 @@ namespace Concert.Models
 {
     public class RegisterTicketViewModel
     {
-        [Display(Name = "Numero ticket")]
+        [Display(Name = "Numero Boleta")]
         public int Id { get; set; }
 
         [Display(Name = "Nombre")]

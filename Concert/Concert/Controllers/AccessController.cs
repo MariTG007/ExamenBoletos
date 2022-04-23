@@ -25,6 +25,7 @@ namespace Concert.Controllers
         public IActionResult CheckTicket()
         {
             return View();
+
         }
 
         [HttpPost]
@@ -107,7 +108,7 @@ namespace Concert.Controllers
                     Name = ticket.Name,
                     Date = (DateTime)ticket.Date,
                     WasUsed = true,
-                    Entrances = await _combosHelper.GetComboEntrancesAsync(),
+                    Entrances = await _combosHelper.GetComboEntrancesAsync()
                 };
 
                     return View(model);
